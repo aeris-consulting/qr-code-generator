@@ -13,6 +13,7 @@ echo "hello" | qrgen -o hello.png
 | --- | --- | --- |
 | `-size` | `512` | image width and height in pixels (1-4096) |
 | `-color` | `#000000` | `#RGB` or `#RRGGBB`, `#` optional; must have 3:1 contrast on white |
+| `-transparent` | | transparent background instead of white (colors are still checked against white) |
 | `-hole` | `none` | empty center: `none`, `circle`, `square` |
 | `-hole-percent` | | empty center as % of the code area (above 0, at most 20) |
 | `-o`, `-output` | `qr.png` | output file, must end in `.png` |

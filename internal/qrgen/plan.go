@@ -114,11 +114,16 @@ func (p *Plan) computeHole() error {
 	return nil
 }
 
-// Render draws the code on a white Size×Size image. Hole modules are left
-// white. Using a 2-color palette keeps large images at one byte per pixel.
+// Render draws the code on a Size×Size image with a white (or, with
+// Transparent, fully transparent) background. Hole modules are left empty.
+// Using a 2-color palette keeps large images at one byte per pixel.
 func (p *Plan) Render() *image.Paletted {
 	size := p.Opts.Size
-	img := image.NewPaletted(image.Rect(0, 0, size, size), color.Palette{color.White, p.Color})
+	var bg color.Color = color.White
+	if p.Opts.Transparent {
+		bg = color.NRGBA{}
+	}
+	img := image.NewPaletted(image.Rect(0, 0, size, size), color.Palette{bg, p.Color})
 	for r := 0; r < p.Total; r++ {
 		for c := 0; c < p.Total; c++ {
 			if !p.bitmap[r][c] || (p.cleared != nil && p.cleared[r][c]) {
@@ -143,6 +148,13 @@ func (p *Plan) Render() *image.Paletted {
 // axis-aligned render (which it always is), because that detector gives up on
 // some valid codes. Either way the data must survive error correction.
 func (p *Plan) Verify(img image.Image) error {
+	// The reader treats transparent pixels as black, so decode as if the
+	// image were placed on white. Palette index 0 is always the background.
+	if pi, ok := img.(*image.Paletted); ok && p.Opts.Transparent {
+		onWhite := *pi
+		onWhite.Palette = color.Palette{color.White, p.Color}
+		img = &onWhite
+	}
 	bmp, err := gozxing.NewBinaryBitmapFromImage(img)
 	if err != nil {
 		return fmt.Errorf("self-verify: %w", err)

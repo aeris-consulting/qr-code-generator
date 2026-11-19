@@ -26,6 +26,7 @@ func (p *Plan) Summary() string {
 		{"Text", fmt.Sprintf("%s  (%d bytes)", preview(p.Opts.Text, 60), len(p.Opts.Text))},
 		{"Size", fmt.Sprintf("%d px  (version %d, %d modules, %d px per module)", p.Opts.Size, p.Version, p.Modules, p.Scale)},
 		{"Color", fmt.Sprintf("#%02X%02X%02X  (contrast %.1f:1)", col.R, col.G, col.B, contrastOnWhite(col))},
+		{"Background", background(p.Opts.Transparent)},
 		{"Hole", hole},
 		{"Error correction", level},
 		{"Output", out},
@@ -35,6 +36,13 @@ func (p *Plan) Summary() string {
 		fmt.Fprintf(&b, "  %-17s %s\n", r[0]+":", r[1])
 	}
 	return b.String()
+}
+
+func background(transparent bool) string {
+	if transparent {
+		return "transparent"
+	}
+	return "white"
 }
 
 func preview(s string, max int) string {

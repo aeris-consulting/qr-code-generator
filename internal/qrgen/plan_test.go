@@ -191,3 +191,45 @@ func TestSummaryMentionsKeyFacts(t *testing.T) {
 		}
 	}
 }
+
+func TestTransparentBackground(t *testing.T) {
+	o := opts(t, func(o *Options) {
+		o.Size, o.Color, o.Transparent = 400, "#102030", true
+		o.HoleShape, o.HolePercent = ShapeCircle, 10
+	})
+	p, err := Build(o)
+	if err != nil {
+		t.Fatal(err)
+	}
+	img := p.Render()
+	if _, _, _, a := img.At(0, 0).RGBA(); a != 0 {
+		t.Errorf("corner alpha = %d, want 0", a)
+	}
+	if _, _, _, a := img.At(200, 200).RGBA(); a != 0 {
+		t.Errorf("hole alpha = %d, want 0", a)
+	}
+	x := p.Margin + 4*p.Scale + p.Scale/2
+	if r, g, b, a := img.At(x, x).RGBA(); a != 0xffff || r>>8 != 0x10 || g>>8 != 0x20 || b>>8 != 0x30 {
+		t.Errorf("code pixel not opaque #102030")
+	}
+	if err := p.Verify(img); err != nil {
+		t.Errorf("verify on transparent image: %v", err)
+	}
+	if err := p.Generate(true, false); err != nil {
+		t.Fatal(err)
+	}
+	data, err := os.ReadFile(o.Output)
+	if err != nil {
+		t.Fatal(err)
+	}
+	decoded, err := png.Decode(bytes.NewReader(data))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if _, _, _, a := decoded.At(0, 0).RGBA(); a != 0 {
+		t.Errorf("written PNG corner alpha = %d, want 0", a)
+	}
+	if !strings.Contains(p.Summary(), "transparent") {
+		t.Error("summary does not mention the transparent background")
+	}
+}

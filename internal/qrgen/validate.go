@@ -41,6 +41,7 @@ type Options struct {
 	Text        string
 	Size        int     // image width and height in pixels
 	Color       string  // #RGB or #RRGGBB, '#' optional
+	Transparent bool    // transparent instead of white background
 	HoleShape   Shape   // none, circle or square
 	HolePercent float64 // percent of the QR symbol area, (0, MaxHolePct]
 	Output      string  // .png path

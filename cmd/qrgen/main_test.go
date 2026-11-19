@@ -169,3 +169,21 @@ func TestHelpAndVersion(t *testing.T) {
 		t.Errorf("%+v", r)
 	}
 }
+
+func TestTransparentFlagWritesAlphaPNG(t *testing.T) {
+	out := filepath.Join(t.TempDir(), "t.png")
+	if r := do(t, "", false, "-transparent", "-size", "300", "-o", out, "hello"); r.code != 0 {
+		t.Fatalf("%+v", r)
+	}
+	data, err := os.ReadFile(out)
+	if err != nil {
+		t.Fatal(err)
+	}
+	img, err := png.Decode(bytes.NewReader(data))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if _, _, _, a := img.At(0, 0).RGBA(); a != 0 {
+		t.Errorf("corner alpha = %d, want 0", a)
+	}
+}

@@ -54,6 +54,7 @@ func run(args []string, stdin io.Reader, stdinTTY bool, stdout, stderr io.Writer
 		textFlag    = fs.String("text", "", "text or URL to encode (alternative to the positional TEXT)")
 		size        = fs.Int("size", def.Size, "image width and height in pixels")
 		colorFlag   = fs.String("color", def.Color, "code color as #RGB or #RRGGBB")
+		transparent = fs.Bool("transparent", false, "transparent background instead of white")
 		hole        = fs.String("hole", "none", "empty center shape: none, circle or square")
 		holePct     = fs.Float64("hole-percent", 0, "empty center as percent of the code area, above 0 and at most 20")
 		output      string
@@ -116,7 +117,7 @@ func run(args []string, stdin io.Reader, stdinTTY bool, stdout, stderr io.Writer
 	if err != nil {
 		return fail(stderr, 2, err)
 	}
-	opts := qrgen.Options{Text: text, Size: *size, Color: *colorFlag, HoleShape: shape, HolePercent: *holePct, Output: output}
+	opts := qrgen.Options{Text: text, Size: *size, Color: *colorFlag, Transparent: *transparent, HoleShape: shape, HolePercent: *holePct, Output: output}
 
 	useInteractive := *interactive || (!given[prompt.FieldText] && stdinTTY)
 	var plan *qrgen.Plan

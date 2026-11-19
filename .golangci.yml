@@ -1,0 +1,10 @@
+version: "2"
+linters:
+  settings:
+    errcheck:
+      # Failing to write to stdout, stderr or the prompt writer is not
+      # recoverable here and has nothing useful to report to.
+      exclude-functions:
+        - fmt.Fprint
+        - fmt.Fprintf
+        - fmt.Fprintln

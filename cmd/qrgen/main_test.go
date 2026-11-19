@@ -23,12 +23,11 @@ func do(t *testing.T, stdin string, tty bool, args ...string) result {
 
 func pngSize(t *testing.T, path string) int {
 	t.Helper()
-	f, err := os.Open(path)
+	data, err := os.ReadFile(path)
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer f.Close()
-	cfg, err := png.DecodeConfig(f)
+	cfg, err := png.DecodeConfig(bytes.NewReader(data))
 	if err != nil || cfg.Width != cfg.Height {
 		t.Fatalf("%s: %+v %v", path, cfg, err)
 	}

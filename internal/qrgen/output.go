@@ -69,8 +69,8 @@ func (p *Plan) Generate(verify, overwrite bool) error {
 		return err
 	}
 	if err := png.Encode(f, img); err != nil {
-		f.Close()
-		os.Remove(p.Opts.Output)
+		_ = f.Close()
+		_ = os.Remove(p.Opts.Output) // best effort: do not leave a truncated PNG behind
 		return err
 	}
 	return f.Close()

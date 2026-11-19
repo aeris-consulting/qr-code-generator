@@ -1,6 +1,7 @@
 package qrgen
 
 import (
+	"bytes"
 	"image/png"
 	"os"
 	"path/filepath"
@@ -148,12 +149,11 @@ func TestGenerateWritesPNGAndProtectsExistingFile(t *testing.T) {
 	if err := p.Generate(true, false); err != nil {
 		t.Fatal(err)
 	}
-	f, err := os.Open(o.Output)
+	data, err := os.ReadFile(o.Output)
 	if err != nil {
 		t.Fatal(err)
 	}
-	cfg, err := png.DecodeConfig(f)
-	f.Close()
+	cfg, err := png.DecodeConfig(bytes.NewReader(data))
 	if err != nil || cfg.Width != 400 || cfg.Height != 400 {
 		t.Fatalf("output PNG: %+v, %v", cfg, err)
 	}

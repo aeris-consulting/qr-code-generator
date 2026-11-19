@@ -23,6 +23,31 @@ echo "hello" | qrgen -o hello.png
 
 Flags go before the text. Exit codes: `0` ok, `1` failure or aborted, `2` invalid input.
 
+## macOS: "cannot be opened" or "Apple could not verify"
+
+The macOS binary is not signed with an Apple Developer ID or notarized, so
+Gatekeeper blocks it when it was downloaded with a browser (the download is
+tagged with a quarantine attribute). The file is not damaged. Either remove the
+quarantine attribute once:
+
+```
+tar -xzf qrgen_*_darwin_arm64.tar.gz
+xattr -d com.apple.quarantine ./qrgen
+./qrgen -version
+```
+
+or allow it in the UI: run `./qrgen` once, then open System Settings →
+Privacy & Security, scroll to the message about "qrgen" and click **Open
+Anyway**. Files fetched with `curl` or `gh release download` are not
+quarantined and run directly.
+
+Before running a downloaded binary you can compare its archive with
+`checksums.txt` from the same release:
+
+```
+shasum -a 256 -c checksums.txt --ignore-missing
+```
+
 ## Empty center
 
 A hole forces error-correction level H. The generated image is decoded again
